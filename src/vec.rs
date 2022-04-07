@@ -12,6 +12,40 @@ impl Vec3 {
     pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
         Self { e: [e0, e1, e2] }
     }
+
+    pub fn x(self) -> f64 {
+        self[0]
+    }
+
+    pub fn y(self) -> f64 {
+        self[1]
+    }
+
+    pub fn z(self) -> f64 {
+        self[2]
+    }
+
+    pub fn dot(self, rhs: Vec3) -> f64 {
+        self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
+    }
+
+    pub fn length(self) -> f64 {
+        self.dot(self).sqrt()
+    }
+
+    pub fn cross(self, rhs: Vec3) -> Self {
+        Self {
+            e: [
+                self[1] * rhs[2] - self[2] * rhs[1],
+                self[2] * rhs[0] - self[0] * rhs[2],
+                self[0] * rhs[1] - self[1] * rhs[0],
+            ],
+        }
+    }
+
+    pub fn normalized(self) -> Self {
+        self / self.length()
+    }
 }
 
 impl ops::Index<usize> for Vec3 {
