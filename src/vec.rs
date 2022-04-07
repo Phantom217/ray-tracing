@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops;
 
 #[derive(Clone, Copy)]
@@ -47,6 +48,12 @@ impl Point3 {
 
     pub fn normalized(self) -> Self {
         self / self.length()
+    }
+}
+
+impl fmt::Display for Vec3 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {}, {})", self[0], self[1], self[2])
     }
 }
 
