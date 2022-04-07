@@ -51,6 +51,17 @@ impl Point3 {
     }
 }
 
+impl Color {
+    pub fn format_color(self) -> String {
+        format!(
+            "{} {} {}",
+            (255.999 * self[0]) as u64,
+            (255.999 * self[1]) as u64,
+            (255.999 * self[2]) as u64
+        )
+    }
+}
+
 impl fmt::Display for Vec3 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self[0], self[1], self[2])
