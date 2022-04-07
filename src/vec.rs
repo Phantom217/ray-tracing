@@ -55,6 +55,59 @@ impl fmt::Display for Vec3 {
     }
 }
 
+impl Point3 {
+    pub fn x(self) -> f64 {
+        self[0]
+    }
+
+    pub fn y(self) -> f64 {
+        self[1]
+    }
+
+    pub fn z(self) -> f64 {
+        self[2]
+    }
+
+    pub fn dot(self, rhs: Vec3) -> f64 {
+        self[0] * rhs[0] + self[1] * rhs[1] + self[2] * rhs[2]
+    }
+
+    pub fn length(self) -> f64 {
+        self.dot(self).sqrt()
+    }
+
+    pub fn cross(self, rhs: Vec3) -> Self {
+        Self {
+            e: [
+                self[1] * rhs[2] - self[2] * rhs[1],
+                self[2] * rhs[0] - self[0] * rhs[2],
+                self[0] * rhs[1] - self[1] * rhs[0],
+            ],
+        }
+    }
+
+    pub fn normalized(self) -> Self {
+        self / self.length()
+    }
+}
+
+impl Color {
+    pub fn format_color(self) -> String {
+        format!(
+            "{} {} {}",
+            (255.999 * self[0]) as u64,
+            (255.999 * self[1]) as u64,
+            (255.999 * self[2]) as u64
+        )
+    }
+}
+
+impl fmt::Display for Vec3 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {}, {})", self[0], self[1], self[2])
+    }
+}
+
 impl ops::Index<usize> for Vec3 {
     type Output = f64;
 
