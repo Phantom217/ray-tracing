@@ -1,0 +1,101 @@
+use std::ops;
+
+#[derive(Clone, Copy)]
+pub struct Vec3 {
+    e: [f64; 3],
+}
+
+pub type Point3 = Vec3;
+pub type Color = Vec3;
+
+impl Vec3 {
+    pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
+        Self { e: [e0, e1, e2] }
+    }
+}
+
+impl ops::Index<usize> for Vec3 {
+    type Output = f64;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.e[index]
+    }
+}
+
+impl ops::IndexMut<usize> for Vec3 {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.e[index]
+    }
+}
+
+impl ops::Add for Vec3 {
+    type Output = Vec3;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            e: [self[0] + rhs[0], self[1] + rhs[1], self[2] + rhs[2]],
+        }
+    }
+}
+
+impl ops::AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = Self {
+            e: [self[0] + rhs[0], self[1] + rhs[1], self[2] + rhs[2]],
+        }
+    }
+}
+
+impl ops::Sub for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            e: [self[0] - rhs[0], self[1] - rhs[1], self[2] - rhs[2]],
+        }
+    }
+}
+
+impl ops::SubAssign for Vec3 {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = Self {
+            e: [self[0] - rhs[0], self[1] - rhs[1], self[2] - rhs[2]],
+        }
+    }
+}
+
+impl ops::Mul<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            e: [self[0] * rhs, self[1] * rhs, self[2] * rhs],
+        }
+    }
+}
+
+impl ops::MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = Self {
+            e: [self[0] * rhs, self[1] * rhs, self[2] * rhs],
+        }
+    }
+}
+
+impl ops::Div<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self {
+            e: [self[0] / rhs, self[1] / rhs, self[2] / rhs],
+        }
+    }
+}
+
+impl ops::DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, rhs: f64) {
+        *self = Self {
+            e: [self[0] / rhs, self[1] / rhs, self[2] / rhs],
+        }
+    }
+}
