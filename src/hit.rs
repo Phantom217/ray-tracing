@@ -9,8 +9,8 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn set_face_normal(&mut self, r: &Ray, outward_normal: Vec3) {
-        self.front_face = r.direction().dot(outward_normal) < 0.0;
+    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
+        self.front_face = ray.direction().dot(outward_normal) < 0.0;
         self.normal = if self.front_face {
             outward_normal
         } else {
@@ -20,5 +20,5 @@ impl HitRecord {
 }
 
 pub trait Hit {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }

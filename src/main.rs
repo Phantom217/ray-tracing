@@ -8,10 +8,10 @@ use std::io::{stderr, Write};
 use ray::Ray;
 use vec::{Color, Point3, Vec3};
 
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = r.origin() - center;
-    let a = r.direction().length().powi(2);
-    let half_b = oc.dot(r.direction());
+fn hit_sphere(center: Point3, radius: f64, ray: &Ray) -> f64 {
+    let oc = ray.origin() - center;
+    let a = ray.direction().length().powi(2);
+    let half_b = oc.dot(ray.direction());
     let c = oc.length().powi(2) - radius.powi(2);
     let discriminant = half_b.powi(2) - a * c;
 
@@ -24,14 +24,14 @@ fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
 /// the ray direction to unit length (`-1.0 < y < 1.0`).
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, r);
+fn ray_color(ray: &Ray) -> Color {
+    let t = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, ray);
     if t > 0.0 {
-        let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
+        let n = (ray.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
         return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
 
-    let unit_direction = r.direction().normalized();
+    let unit_direction = ray.direction().normalized();
     let t = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
@@ -63,11 +63,11 @@ fn main() {
             let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
             let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
 
-            let r = Ray::new(
+            let ray = Ray::new(
                 origin,
                 lower_left_corner + u * horizontal + v * vertical - origin,
             );
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&ray);
 
             println!("{}", pixel_color.format_color());
         }
