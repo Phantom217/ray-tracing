@@ -6,6 +6,8 @@ use std::io::{stderr, Write};
 use ray::Ray;
 use vec::{Color, Point3, Vec3};
 
+/// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
+/// the ray direction to unit length (`-1.0 < y < 1.0`).
 fn ray_color(r: &Ray) -> Color {
     let unit_direction = r.direction().normalized();
     let t = 0.5 * (unit_direction.y() + 1.0);
