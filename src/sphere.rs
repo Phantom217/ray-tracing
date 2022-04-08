@@ -37,11 +37,15 @@ impl Hit for Sphere {
         }
 
         let p = r.at(root);
-        let hr = HitRecord {
+        let mut hr = HitRecord {
             t: root,
             p,
-            normal: (p - self.center) / self.radius,
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            front_face: false,
         };
+
+        let outward_normal = (hr.p - self.center) / self.radius;
+        hr.set_face_normal(r, outward_normal);
 
         Some(hr)
     }
