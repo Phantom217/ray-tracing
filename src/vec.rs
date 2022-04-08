@@ -126,6 +126,16 @@ impl ops::Mul<f64> for Vec3 {
     }
 }
 
+impl ops::Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            e: [self * rhs[0], self * rhs[1], self * rhs[2]],
+        }
+    }
+}
+
 impl ops::MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
         *self = Self {
@@ -140,6 +150,16 @@ impl ops::Div<f64> for Vec3 {
     fn div(self, rhs: f64) -> Self::Output {
         Self {
             e: [self[0] / rhs, self[1] / rhs, self[2] / rhs],
+        }
+    }
+}
+
+impl ops::Div<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn div(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            e: [self / rhs[0], self / rhs[1], self / rhs[2]],
         }
     }
 }
