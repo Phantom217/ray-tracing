@@ -1,4 +1,6 @@
+mod hit;
 mod ray;
+mod sphere;
 mod vec;
 
 use std::io::{stderr, Write};
@@ -10,8 +12,8 @@ fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - center;
     let a = r.direction().length().powi(2);
     let half_b = oc.dot(r.direction());
-    let c = oc.length().powi(2) - radius * radius;
-    let discriminant = half_b * half_b - a * c;
+    let c = oc.length().powi(2) - radius.powi(2);
+    let discriminant = half_b.powi(2) - a * c;
 
     if discriminant < 0.0 {
         -1.0
