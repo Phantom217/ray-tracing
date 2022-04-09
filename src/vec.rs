@@ -51,7 +51,7 @@ impl Vec3 {
     }
 
     /// Pick a random point where `x`, `y`, `z` are all in `range`.
-    fn random(range: Range<f64>) -> Self {
+    pub fn random(range: Range<f64>) -> Self {
         let mut rng = rand::thread_rng();
 
         Self {
