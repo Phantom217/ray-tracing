@@ -3,7 +3,7 @@ use super::ray::Ray;
 use super::vec::Color;
 use super::vec::Vec3;
 
-pub trait Scatter {
+pub trait Scatter: Send + Sync {
     fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)>;
 }
 
