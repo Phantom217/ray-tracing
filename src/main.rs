@@ -11,13 +11,15 @@ use hit::{Hit, World};
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
-use vec::{Color, Point3};
+use vec::{Color, Point3, Vec3};
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
 /// the ray direction to unit length (`-1.0 < y < 1.0`).
 fn ray_color(ray: &Ray, world: &World) -> Color {
     if let Some(hr) = world.hit(ray, 0.0, f64::INFINITY) {
-        0.5 * (hr.normal + Color::new(1.0, 1.0, 1.0))
+        let target = hr.p + hr.normal + Vec3::random_in_unit_sphere();
+        let ray = Ray::new(hr.p, target - hr.p);
+        0.5 * ray_color(&ray, world)
     } else {
         let unit_direction = ray.direction().normalized();
         let t = 0.5 * (unit_direction.y() + 1.0);
