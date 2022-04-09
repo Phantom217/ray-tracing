@@ -21,7 +21,7 @@ fn ray_color(ray: &Ray, world: &World, depth: u64) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    if let Some(hr) = world.hit(ray, 0.0, f64::INFINITY) {
+    if let Some(hr) = world.hit(ray, 0.001, f64::INFINITY) {
         let target = hr.p + hr.normal + Vec3::random_in_unit_sphere();
         let ray = Ray::new(hr.p, target - hr.p);
         0.5 * ray_color(&ray, world, depth - 1)
@@ -52,7 +52,7 @@ fn main() {
 
     let mut rng = rand::thread_rng();
     for j in (0..IMAGE_HEIGHT).rev() {
-        eprint!("\rScanlines remaining: {:3}", IMAGE_HEIGHT - j - 1);
+        eprint!("\rScanlines remaining: {:3}", j + 1);
         stderr().flush().unwrap();
 
         for i in 0..IMAGE_WIDTH {
