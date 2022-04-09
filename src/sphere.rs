@@ -47,7 +47,7 @@ impl Hit for Sphere {
         let mut hr = HitRecord {
             p: ray.at(root),
             normal: Vec3::new(0.0, 0.0, 0.0),
-            materal: self.material.clone(),
+            material: self.material.clone(),
             t: root,
             front_face: false,
         };

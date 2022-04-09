@@ -12,6 +12,7 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
+    /// Create a new `Lambertian` material.
     pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
@@ -28,5 +29,29 @@ impl Scatter for Lambertian {
         let scattered = Ray::new(hr.p, scatter_direction);
 
         Some((self.albedo, scattered))
+    }
+}
+
+pub struct Metal {
+    albedo: Color,
+}
+
+impl Metal {
+    /// Create a new `Metal` material.
+    pub fn new(albedo: Color) -> Self {
+        Self { albedo }
+    }
+}
+
+impl Scatter for Metal {
+    fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
+        let reflected = ray_in.direction().reflect(hr.normal).normalized();
+        let scattered = Ray::new(hr.p, reflected);
+
+        if scattered.direction().dot(hr.normal) > 0.0 {
+            Some((self.albedo, scattered))
+        } else {
+            None
+        }
     }
 }

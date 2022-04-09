@@ -85,9 +85,14 @@ impl Vec3 {
         }
     }
 
+    /// Check if vector is very close to zero in all dimensions.
     pub fn near_zero(&self) -> bool {
         const EPS: f64 = 1.0e-8;
         self[0].abs() < EPS && self[1].abs() < EPS && self[2].abs() < EPS
+    }
+
+    pub fn reflect(self, normal: Vec3) -> Self {
+        self - 2.0 * self.dot(normal) * normal
     }
 }
 
@@ -158,6 +163,16 @@ impl ops::SubAssign for Vec3 {
     }
 }
 
+impl ops::Mul for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Self {
+            e: [self[0] * rhs[0], self[1] * rhs[1], self[2] * rhs[2]],
+        }
+    }
+}
+
 impl ops::Mul<f64> for Vec3 {
     type Output = Vec3;
 
@@ -182,6 +197,16 @@ impl ops::MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
         *self = Self {
             e: [self[0] * rhs, self[1] * rhs, self[2] * rhs],
+        }
+    }
+}
+
+impl ops::Div for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, rhs: Vec3) -> Self::Output {
+        Self {
+            e: [self[0] / rhs[0], self[1] / rhs[1], self[2] / rhs[2]],
         }
     }
 }
