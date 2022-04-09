@@ -19,11 +19,11 @@ impl Lambertian {
 }
 
 impl Scatter for Lambertian {
-    fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
-        let mut scatter_direction = hr.normal + Vec3::random_in_unit_sphere().normalized();
+    fn scatter(&self, _ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
+        let mut scatter_direction = hr.norm + Vec3::random_in_unit_sphere().normalized();
         if scatter_direction.near_zero() {
             // catch degenerate scatter direction
-            scatter_direction = hr.normal;
+            scatter_direction = hr.norm;
         }
 
         let scattered = Ray::new(hr.p, scatter_direction);
@@ -46,13 +46,42 @@ impl Metal {
 
 impl Scatter for Metal {
     fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
-        let reflected = ray_in.direction().reflect(hr.normal).normalized();
+        let reflected = ray_in.direction().reflect(hr.norm).normalized();
         let scattered = Ray::new(hr.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
 
-        if scattered.direction().dot(hr.normal) > 0.0 {
+        if scattered.direction().dot(hr.norm) > 0.0 {
             Some((self.albedo, scattered))
         } else {
             None
         }
+    }
+}
+
+pub struct Dielectric {
+    /// Index of refraction
+    ir: f64,
+}
+
+impl Dielectric {
+    pub fn new(index_of_refraction: f64) -> Self {
+        Self {
+            ir: index_of_refraction,
+        }
+    }
+}
+
+impl Scatter for Dielectric {
+    fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
+        let refraction_ratio = if hr.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
+
+        let unit_direction = ray_in.direction().normalized();
+        let refracted = unit_direction.refract(hr.norm, refraction_ratio);
+        let scattered = Ray::new(hr.p, refracted);
+
+        Some((Color::new(1.0, 1.0, 1.0), scattered))
     }
 }

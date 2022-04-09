@@ -75,10 +75,10 @@ impl Vec3 {
     }
 
     /// Pick a random point in hemisphere.
-    pub fn random_in_hemisphere(normal: Vec3) -> Self {
+    pub fn random_in_hemisphere(norm: Vec3) -> Self {
         let in_unit_sphere = Self::random_in_unit_sphere();
-        if in_unit_sphere.dot(normal) > 0.0 {
-            // In the same hemisphere as the normal
+        if in_unit_sphere.dot(norm) > 0.0 {
+            // In the same hemisphere as the norm
             in_unit_sphere
         } else {
             (-1.0) * in_unit_sphere
@@ -91,8 +91,16 @@ impl Vec3 {
         self[0].abs() < EPS && self[1].abs() < EPS && self[2].abs() < EPS
     }
 
-    pub fn reflect(self, normal: Vec3) -> Self {
-        self - 2.0 * self.dot(normal) * normal
+    pub fn reflect(self, norm: Vec3) -> Self {
+        self - 2.0 * self.dot(norm) * norm
+    }
+
+    pub fn refract(self, norm: Vec3, etai_over_etat: f64) -> Self {
+        let cos_theta = ((-1.0) * self).dot(norm).min(1.0);
+        let ray_out_perp = etai_over_etat * (self + cos_theta * norm);
+        let ray_out_parallel = -(1.0 - ray_out_perp.length().powi(2)).abs().sqrt() * norm;
+
+        ray_out_perp + ray_out_parallel
     }
 }
 
