@@ -26,7 +26,7 @@ impl Scatter for Lambertian {
             scatter_direction = hr.norm;
         }
 
-        let scattered = Ray::new(hr.p, scatter_direction);
+        let scattered = Ray::new(hr.p, scatter_direction, 0.0);
 
         Some((self.albedo, scattered))
     }
@@ -47,7 +47,11 @@ impl Metal {
 impl Scatter for Metal {
     fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
         let reflected = ray_in.direction().reflect(hr.norm).normalized();
-        let scattered = Ray::new(hr.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
+        let scattered = Ray::new(
+            hr.p,
+            reflected + self.fuzz * Vec3::random_in_unit_sphere(),
+            0.0,
+        );
 
         if scattered.direction().dot(hr.norm) > 0.0 {
             Some((self.albedo, scattered))
@@ -102,7 +106,7 @@ impl Scatter for Dielectric {
             unit_direction.refract(hr.norm, refraction_ratio)
         };
 
-        let scattered = Ray::new(hr.p, direction);
+        let scattered = Ray::new(hr.p, direction, 0.0);
 
         Some((Color::new(1.0, 1.0, 1.0), scattered))
     }
