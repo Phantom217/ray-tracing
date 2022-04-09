@@ -64,12 +64,21 @@ fn main() {
     world.push(Box::new(sphere_right));
 
     // Camera
+    let lookfrom = Point3::new(3.0, 3.0, 2.0);
+    let lookat = Point3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let vfov = 20.0;
+    let aperture = 2.0;
+    let focus_dist = (lookfrom - lookat).length();
+
     let camera = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        90.0,
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
         ASPECT_RATIO,
+        aperture,
+        focus_dist,
     );
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
