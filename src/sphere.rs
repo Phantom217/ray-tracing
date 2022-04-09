@@ -1,19 +1,21 @@
 use std::sync::Arc;
 
-use super::hit::{Hit, HitRecord};
-use super::material::Scatter;
-use super::ray::Ray;
-use super::vec::{Point3, Vec3};
+use super::{
+    hit::{Hit, HitRecord},
+    material::Material,
+    ray::Ray,
+    vec::Point3,
+};
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    material: Arc<dyn Scatter>,
+    material: Arc<dyn Material>,
 }
 
 impl Sphere {
     /// Create a new `Sphere`.
-    pub fn new(center: Point3, radius: f64, material: Arc<dyn Scatter>) -> Self {
+    pub fn new(center: Point3, radius: f64, material: Arc<dyn Material>) -> Self {
         Self {
             center,
             radius,

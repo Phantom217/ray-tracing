@@ -1,5 +1,7 @@
-use super::ray::Ray;
-use super::vec::{Point3, Vec3};
+use super::{
+    ray::Ray,
+    vec::{Point3, Vec3},
+};
 
 pub struct Camera {
     origin: Point3,
