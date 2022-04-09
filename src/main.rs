@@ -1,13 +1,16 @@
 mod camera;
 mod hit;
+mod material;
 mod ray;
 mod sphere;
 mod vec;
 
 use std::io::{stderr, Write};
+use std::rc::Rc;
 
 use camera::Camera;
 use hit::{Hit, World};
+use material::Lambertian;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
@@ -42,8 +45,14 @@ fn main() {
 
     // World
     let mut world = World::new();
-    world.push(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+
+    let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
+    let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
+
+    world.push(Box::new(sphere_ground));
+    world.push(Box::new(sphere_center));
 
     // Camera
     let camera = Camera::new();
