@@ -20,7 +20,7 @@ use vec::{Color, Point3, Vec3};
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
 /// the ray direction to unit length (`-1.0 < y < 1.0`).
-fn ray_color(ray: &Ray, world: &World, depth: u64) -> Color {
+fn ray_color(ray: &Ray, world: &World, depth: u32) -> Color {
     if let Some(hr) = world.hit(ray, 0.001, f64::INFINITY) {
         match hr.material.scatter(ray, &hr) {
             Some((attenuation, scattered)) if depth > 0 => {
@@ -96,10 +96,10 @@ fn random_scene() -> World {
 fn main() {
     // Image
     const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: u64 = 1200;
-    const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 500;
-    const MAX_DEPTH: u64 = 50;
+    const IMAGE_WIDTH: u32 = 1200;
+    const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
+    const SAMPLES_PER_PIXEL: u32 = 500;
+    const MAX_DEPTH: u32 = 50;
 
     // World
     let world = random_scene();
@@ -137,8 +137,8 @@ fn main() {
                     let random_u: f64 = rng.gen();
                     let random_v: f64 = rng.gen();
 
-                    let u = ((i as f64) + random_u) / ((IMAGE_WIDTH - 1) as f64);
-                    let v = ((j as f64) + random_v) / ((IMAGE_HEIGHT - 1) as f64);
+                    let u = (f64::from(i) + random_u) / f64::from(IMAGE_WIDTH - 1);
+                    let v = (f64::from(j) + random_v) / f64::from(IMAGE_HEIGHT - 1);
 
                     let ray = camera.get_ray(u, v);
                     pixel_color += ray_color(&ray, &world, MAX_DEPTH);
