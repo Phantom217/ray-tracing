@@ -50,13 +50,13 @@ impl Vec3 {
 }
 
 impl Color {
-    pub fn format_color(self) -> String {
-        format!(
-            "{} {} {}",
-            (255.999 * self[0]) as u64,
-            (255.999 * self[1]) as u64,
-            (255.999 * self[2]) as u64
-        )
+    /// Get color of pixel by taking the average over the number of `samples`.
+    pub fn format_color(self, samples: u64) -> String {
+        let ir = (256.0 * (self[0] / (samples as f64)).clamp(0.0, 0.999)) as u64;
+        let ig = (256.0 * (self[1] / (samples as f64)).clamp(0.0, 0.999)) as u64;
+        let ib = (256.0 * (self[2] / (samples as f64)).clamp(0.0, 0.999)) as u64;
+
+        format!("{} {} {}", ir, ig, ib)
     }
 }
 
