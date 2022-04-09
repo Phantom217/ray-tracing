@@ -1,6 +1,5 @@
 use std::fmt;
-use std::ops;
-use std::ops::Range;
+use std::ops::{self, Range};
 
 use rand::Rng;
 
@@ -52,7 +51,7 @@ impl Vec3 {
     }
 
     /// Pick a random point where `x`, `y`, `z` are all in `range`.
-    pub fn random(range: Range<f64>) -> Self {
+    fn random(range: Range<f64>) -> Self {
         let mut rng = rand::thread_rng();
 
         Self {
@@ -81,12 +80,12 @@ impl Vec3 {
             // In the same hemisphere as the norm
             in_unit_sphere
         } else {
-            (-1.0) * in_unit_sphere
+            -1.0 * in_unit_sphere
         }
     }
 
     /// Check if vector is very close to zero in all dimensions.
-    pub fn near_zero(&self) -> bool {
+    pub fn near_zero(self) -> bool {
         const EPS: f64 = 1.0e-8;
         self[0].abs() < EPS && self[1].abs() < EPS && self[2].abs() < EPS
     }
@@ -96,7 +95,7 @@ impl Vec3 {
     }
 
     pub fn refract(self, norm: Vec3, etai_over_etat: f64) -> Self {
-        let cos_theta = ((-1.0) * self).dot(norm).min(1.0);
+        let cos_theta = (-1.0 * self).dot(norm).min(1.0);
         let ray_out_perp = etai_over_etat * (self + cos_theta * norm);
         let ray_out_parallel = -(1.0 - ray_out_perp.length().powi(2)).abs().sqrt() * norm;
 

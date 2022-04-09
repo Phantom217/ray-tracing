@@ -68,10 +68,18 @@ impl Dielectric {
             ir: index_of_refraction,
         }
     }
+
+    pub fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+        // Use Schlick's approximation for reflectance
+        let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Scatter for Dielectric {
     fn scatter(&self, ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
+        use rand::Rng;
+
         let refraction_ratio = if hr.front_face {
             1.0 / self.ir
         } else {
@@ -82,9 +90,15 @@ impl Scatter for Dielectric {
         let cos_theta = ((-1.0) * unit_direction).dot(hr.norm).min(1.0);
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        let direction = if refraction_ratio * sin_theta > 1.0 {
+        let mut rng = rand::thread_rng();
+        let cannot_refract = refraction_ratio * sin_theta > 1.0;
+        let will_reflect = rng.gen::<f64>() < Self::reflectance(cos_theta, refraction_ratio);
+
+        let direction = if cannot_refract || will_reflect {
+            // must reflect
             unit_direction.reflect(hr.norm)
         } else {
+            // can refract
             unit_direction.refract(hr.norm, refraction_ratio)
         };
 

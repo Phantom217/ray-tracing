@@ -8,10 +8,11 @@ mod vec;
 use std::io::{stderr, Write};
 use std::rc::Rc;
 
+use rand::Rng;
+
 use camera::Camera;
 use hit::{Hit, World};
 use material::{Dielectric, Lambertian, Metal};
-use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use vec::{Color, Point3, Vec3};
@@ -19,11 +20,6 @@ use vec::{Color, Point3, Vec3};
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
 /// the ray direction to unit length (`-1.0 < y < 1.0`).
 fn ray_color(ray: &Ray, world: &World, depth: u64) -> Color {
-    if depth <= 0 {
-        // If we've exceeded the ray bounce limit, no more light is gathered
-        return Color::new(0.0, 0.0, 0.0);
-    }
-
     if let Some(hr) = world.hit(ray, 0.001, f64::INFINITY) {
         match hr.material.scatter(ray, &hr) {
             Some((attenuation, scattered)) if depth > 0 => {
@@ -51,16 +47,19 @@ fn main() {
     let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let mat_left = Rc::new(Dielectric::new(1.5));
+    let mat_left_inner = Rc::new(Dielectric::new(1.5));
     let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
     let sphere_ground = Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, mat_ground);
     let sphere_center = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, mat_center);
     let sphere_left = Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, mat_left);
+    let sphere_left_inner = Sphere::new(Point3::new(-1.0, 0.0, -1.0), -0.4, mat_left_inner);
     let sphere_right = Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, mat_right);
 
     world.push(Box::new(sphere_ground));
     world.push(Box::new(sphere_center));
     world.push(Box::new(sphere_left));
+    world.push(Box::new(sphere_left_inner));
     world.push(Box::new(sphere_right));
 
     // Camera
