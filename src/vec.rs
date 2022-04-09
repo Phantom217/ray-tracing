@@ -1,5 +1,8 @@
 use std::fmt;
 use std::ops;
+use std::ops::Range;
+
+use rand::Rng;
 
 #[derive(Clone, Copy)]
 pub struct Vec3 {
@@ -46,6 +49,29 @@ impl Vec3 {
 
     pub fn normalized(self) -> Self {
         self / self.length()
+    }
+
+    /// Pick a random point where `x`, `y`, `z` are all in `range`.
+    pub fn random(range: Range<f64>) -> Self {
+        let mut rng = rand::thread_rng();
+
+        Self {
+            e: [
+                rng.gen_range(range.clone()),
+                rng.gen_range(range.clone()),
+                rng.gen_range(range),
+            ],
+        }
+    }
+
+    /// Pick a random point in the unit sphere where `x`, `y`, and `z` are all in range from `-1..1`.
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let v = Vec3::random(-1.0..1.0);
+            if v.length() < 1.0 {
+                return v;
+            }
+        }
     }
 }
 
