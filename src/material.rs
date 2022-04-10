@@ -1,4 +1,4 @@
-use super::{hit::HitRecord, ray::Ray, vec::Color};
+use super::{hittable::HitRecord, ray::Ray, vec::Color};
 
 mod dielectric;
 mod lambertian;

@@ -1,6 +1,6 @@
 use super::Material;
 use crate::{
-    hit::HitRecord,
+    hittable::HitRecord,
     ray::Ray,
     vec::{Color, Vec3},
 };
@@ -18,13 +18,13 @@ impl Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, _ray_in: &Ray, hr: &HitRecord) -> Option<(Color, Ray)> {
-        let mut scatter_direction = hr.norm + Vec3::random_in_unit_sphere().normalized();
+        let mut scatter_direction = hr.norm() + Vec3::random_in_unit_sphere().normalized();
         if scatter_direction.near_zero() {
             // catch degenerate scatter direction
-            scatter_direction = hr.norm;
+            scatter_direction = hr.norm();
         }
 
-        let scattered = Ray::new(hr.p, scatter_direction, 0.0);
+        let scattered = Ray::new(hr.p(), scatter_direction, 0.0);
 
         Some((self.albedo, scattered))
     }

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use super::{
-    hit::{Hit, HitRecord},
+    hittable::{HitRecord, Hittable},
     material::Material,
     ray::Ray,
     vec::Point3,
@@ -24,7 +24,7 @@ impl Sphere {
     }
 }
 
-impl Hit for Sphere {
+impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - self.center;
         let a = ray.direction().length().powi(2);
@@ -46,17 +46,11 @@ impl Hit for Sphere {
             }
         }
 
-        let mut hr = HitRecord {
-            p: ray.at(root),
-            norm: Point3::new(0.0, 0.0, 0.0),
-            material: self.material.clone(),
-            t: root,
-            front_face: false,
-        };
+        let time = root;
+        let p = ray.at(time);
+        let outward_normal = (p - self.center) / self.radius;
+        let material = Arc::clone(&self.material);
 
-        let outward_normal = (hr.p - self.center) / self.radius;
-        hr.set_face_normal(ray, outward_normal);
-
-        Some(hr)
+        Some(HitRecord::new(ray, p, outward_normal, material, time))
     }
 }

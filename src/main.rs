@@ -1,5 +1,5 @@
 mod camera;
-mod hit;
+mod hittable;
 mod material;
 mod ray;
 mod sphere;
@@ -12,7 +12,7 @@ use rand::Rng;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use camera::Camera;
-use hit::{Hit, World};
+use hittable::{Hittable, World};
 use material::{Dielectric, Lambertian, Metal};
 use ray::Ray;
 use sphere::Sphere;
@@ -22,7 +22,7 @@ use vec::{Color, Point3, Vec3};
 /// the ray direction to unit length (`-1.0 < y < 1.0`).
 fn ray_color(ray: &Ray, world: &World, depth: u32) -> Color {
     if let Some(hr) = world.hit(ray, 0.001, f64::INFINITY) {
-        match hr.material.scatter(ray, &hr) {
+        match hr.material().scatter(ray, &hr) {
             Some((attenuation, scattered)) if depth > 0 => {
                 attenuation * ray_color(&scattered, world, depth - 1)
             }
