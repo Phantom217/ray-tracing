@@ -15,7 +15,7 @@ use camera::Camera;
 use hittable::{Hittable, World};
 use material::{Dielectric, Lambertian, Metal};
 use ray::Ray;
-use shape::Sphere;
+use shape::{MovingSphere, Point4, Sphere};
 use vec::{Color, Point3, Vec3};
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
@@ -57,9 +57,12 @@ fn random_scene() -> World {
                 // Diffuse
                 let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
                 let sphere_mat = Arc::new(Lambertian::new(albedo));
-                let sphere = Sphere::new(center, 0.2, sphere_mat);
+                let center0 = Point4::new(center, 0.0);
+                let center1 =
+                    Point4::new(center + Vec3::new(0.0, rng.gen_range(0.0..=0.5), 0.0), 1.0);
+                let moving_sphere = MovingSphere::new(center0, center1, 0.2, sphere_mat);
 
-                world.push(Box::new(sphere));
+                world.push(Box::new(moving_sphere));
             } else if choose_mat < 0.95 {
                 // Metal
                 let albedo = Color::random(0.4..1.0);
@@ -95,10 +98,10 @@ fn random_scene() -> World {
 
 fn main() {
     // Image
-    const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: u32 = 1200;
+    const ASPECT_RATIO: f64 = 16.0 / 9.0;
+    const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
-    const SAMPLES_PER_PIXEL: u32 = 500;
+    const SAMPLES_PER_PIXEL: u32 = 100;
     const MAX_DEPTH: u32 = 50;
 
     // World
