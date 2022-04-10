@@ -24,7 +24,7 @@ impl Material for Metal {
         let scattered = Ray::new(
             hr.p(),
             reflected + self.fuzz * Vec3::random_in_unit_sphere(),
-            0.0,
+            ray_in.time(),
         );
 
         if scattered.direction().dot(hr.norm()) > 0.0 {
