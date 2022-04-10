@@ -111,6 +111,8 @@ fn main() {
     let vfov = 20.0;
     let aperture = 0.1;
     let focus_dist = 10.0;
+    let time0 = 0.0;
+    let time1 = 1.0;
 
     let camera = Camera::new(
         lookfrom,
@@ -120,6 +122,7 @@ fn main() {
         ASPECT_RATIO,
         aperture,
         focus_dist,
+        time0..time1,
     );
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);

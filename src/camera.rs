@@ -1,7 +1,11 @@
+use std::ops::Range;
+
 use super::{
     ray::Ray,
     vec::{Point3, Vec3},
 };
+
+use rand::{distributions::Uniform, prelude::*};
 
 pub struct Camera {
     origin: Point3,
@@ -11,6 +15,8 @@ pub struct Camera {
     cu: Vec3,
     cv: Vec3,
     lens_radius: f64,
+    /// Shutter open/close time
+    time_range: Uniform<f64>,
 }
 
 impl Camera {
@@ -22,7 +28,10 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus_dist: f64,
+        time_range: Range<f64>,
     ) -> Self {
+        assert!(!time_range.is_empty());
+
         // Vertical field-of-view in degrees
         let theta = std::f64::consts::PI / 180.0 * vfov;
         let viewport_height = 2.0 * (theta / 2.0).tan();
@@ -45,6 +54,7 @@ impl Camera {
             cu,
             cv,
             lens_radius: aperture / 2.0,
+            time_range: Uniform::from(time_range),
         }
     }
 
@@ -55,7 +65,7 @@ impl Camera {
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
-            0.0,
+            thread_rng().sample(self.time_range),
         )
     }
 }
