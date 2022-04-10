@@ -3,7 +3,7 @@ use std::ops::{self, Range};
 
 use rand::Rng;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     e: [f64; 3],
 }

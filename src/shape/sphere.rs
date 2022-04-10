@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
-use super::{
+use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
     ray::Ray,
     vec::Point3,
 };
 
+#[derive(Debug)]
 pub struct Sphere {
     center: Point3,
     radius: f64,

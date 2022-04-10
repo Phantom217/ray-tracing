@@ -1,6 +1,7 @@
 use super::Material;
 use crate::{hittable::HitRecord, ray::Ray, vec::Color};
 
+#[derive(Debug, PartialEq)]
 pub struct Dielectric {
     /// Index of refraction
     ir: f64,

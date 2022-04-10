@@ -6,6 +6,7 @@ use crate::{
     vec::{Point3, Vec3},
 };
 
+#[derive(Debug)]
 pub struct HitRecord {
     p: Point3,
     norm: Vec3,

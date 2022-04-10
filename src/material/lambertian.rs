@@ -5,6 +5,7 @@ use crate::{
     vec::{Color, Vec3},
 };
 
+#[derive(Debug, PartialEq)]
 pub struct Lambertian {
     albedo: Color,
 }

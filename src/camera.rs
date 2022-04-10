@@ -7,6 +7,7 @@ use super::{
 
 use rand::{distributions::Uniform, prelude::*};
 
+#[derive(Debug)]
 pub struct Camera {
     origin: Point3,
     horizontal: Vec3,

@@ -5,6 +5,7 @@ use crate::{
     vec::{Color, Vec3},
 };
 
+#[derive(Debug, PartialEq)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
