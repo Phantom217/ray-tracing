@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
@@ -9,16 +7,16 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct MovingSphere {
+pub struct MovingSphere<M: Material> {
     center0: Point4,
     center1: Point4,
     radius: f64,
-    material: Arc<dyn Material>,
+    material: M,
 }
 
-impl MovingSphere {
+impl<M: Material> MovingSphere<M> {
     /// Create new `MovingSphere`.
-    pub fn new(center0: Point4, center1: Point4, radius: f64, material: Arc<dyn Material>) -> Self {
+    pub fn new(center0: Point4, center1: Point4, radius: f64, material: M) -> Self {
         Self {
             center0,
             center1,
@@ -35,7 +33,7 @@ impl MovingSphere {
     }
 }
 
-impl Hittable for MovingSphere {
+impl<M: Material> Hittable for MovingSphere<M> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - self.center(ray.time());
         let a = ray.direction().length().powi(2);
@@ -60,9 +58,8 @@ impl Hittable for MovingSphere {
         let time = root;
         let p = ray.at(time);
         let outward_normal = (p - self.center(ray.time())) / self.radius;
-        let material = Arc::clone(&self.material);
 
-        Some(HitRecord::new(ray, p, outward_normal, material, time))
+        Some(HitRecord::new(ray, p, outward_normal, &self.material, time))
     }
 }
 
@@ -82,7 +79,7 @@ mod tests {
             pos: Point3::new(1.0, 0.0, 0.0),
             time: 1.0,
         };
-        let ms = MovingSphere::new(center0, center1, 1.0, Arc::new(Dielectric::new(1.5)));
+        let ms = MovingSphere::new(center0, center1, 1.0, Dielectric::new(1.5));
 
         let actual = ms.center(0.5);
         let expected = Point3::new(0.5, 0.0, 0.0);

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     material::Material,
     ray::Ray,
@@ -7,20 +5,20 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     p: Point3,
     norm: Vec3,
-    material: Arc<dyn Material>,
+    material: &'a dyn Material,
     t: f64,
     front_face: bool,
 }
 
-impl HitRecord {
+impl<'a> HitRecord<'a> {
     pub fn new(
         ray: &Ray,
         p: Point3,
         outward_normal: Vec3,
-        material: Arc<dyn Material>,
+        material: &'a dyn Material,
         t: f64,
     ) -> Self {
         let front_face = ray.direction().dot(outward_normal) < 0.0;
@@ -55,7 +53,7 @@ impl HitRecord {
         self.front_face
     }
 
-    pub fn material(&self) -> Arc<dyn Material> {
-        Arc::clone(&self.material)
+    pub fn material(&self) -> &'a dyn Material {
+        self.material
     }
 }

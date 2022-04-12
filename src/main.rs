@@ -6,7 +6,6 @@ mod shape;
 mod vec;
 
 use std::io::{stderr, Write};
-use std::sync::Arc;
 
 use rand::Rng;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -39,7 +38,7 @@ fn random_scene() -> World {
     let mut rng = rand::thread_rng();
     let mut world = World::new();
 
-    let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_mat = Lambertian::new(Color::new(0.5, 0.5, 0.5));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_mat);
 
     world.push(Box::new(ground_sphere));
@@ -56,7 +55,7 @@ fn random_scene() -> World {
             if choose_mat < 0.8 {
                 // Diffuse
                 let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
-                let sphere_mat = Arc::new(Lambertian::new(albedo));
+                let sphere_mat = Lambertian::new(albedo);
                 let center0 = Point4::new(center, 0.0);
                 let center1 =
                     Point4::new(center + Vec3::new(0.0, rng.gen_range(0.0..=0.5), 0.0), 1.0);
@@ -67,13 +66,13 @@ fn random_scene() -> World {
                 // Metal
                 let albedo = Color::random(0.4..1.0);
                 let fuzz = rng.gen_range(0.0..0.5);
-                let sphere_mat = Arc::new(Metal::new(albedo, fuzz));
+                let sphere_mat = Metal::new(albedo, fuzz);
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
             } else {
                 // Glass
-                let sphere_mat = Arc::new(Dielectric::new(1.5));
+                let sphere_mat = Dielectric::new(1.5);
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
@@ -81,9 +80,9 @@ fn random_scene() -> World {
         }
     }
 
-    let mat1 = Arc::new(Dielectric::new(1.5));
-    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let mat1 = Dielectric::new(1.5);
+    let mat2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
+    let mat3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
     let sphere2 = Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, mat2);
