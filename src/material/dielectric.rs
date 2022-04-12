@@ -1,19 +1,29 @@
-use super::Material;
-use crate::{hittable::HitRecord, ray::Ray, vec::Color};
+use crate::hittable::HitRecord;
+use crate::material::Material;
+use crate::ray::Ray;
+use crate::vec::Color;
 
+/// A transparent refractive material like glass or water.
 #[derive(Debug, PartialEq)]
 pub struct Dielectric {
-    /// Index of refraction
-    ir: f64,
+    /// [Refractive index][ref-idx] of the material, which determines how
+    /// much light is bent when traveling into or out of an object.
+    ///
+    /// [ref-idx]: https://en.wikipedia.org/wiki/Refractive_index
+    ref_idx: f64,
 }
 
 impl Dielectric {
     pub fn new(index_of_refraction: f64) -> Self {
         Self {
-            ir: index_of_refraction,
+            ref_idx: index_of_refraction,
         }
     }
 
+    /// [Schlick's approximation][schlick] for computing reflection vs. refraction at a material
+    /// surface.
+    ///
+    /// [schlick]: https://en.wikipedia.org/wiki/Schlick%27s_approximation
     pub fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
         // Use Schlick's approximation for reflectance
         let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
@@ -26,9 +36,9 @@ impl Material for Dielectric {
         use rand::Rng;
 
         let refraction_ratio = if hr.front_face() {
-            1.0 / self.ir
+            1.0 / self.ref_idx
         } else {
-            self.ir
+            self.ref_idx
         };
 
         let unit_direction = ray_in.direction().normalized();

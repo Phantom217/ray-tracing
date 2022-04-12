@@ -1,10 +1,8 @@
-use crate::{
-    hittable::{HitRecord, Hittable},
-    material::Material,
-    ray::Ray,
-    object::Point4,
-    vec::Point3,
-};
+use crate::hittable::{HitRecord, Hittable};
+use crate::material::Material;
+use crate::object::Point4;
+use crate::ray::Ray;
+use crate::vec::Point3;
 
 /// A sphere
 #[derive(Debug)]

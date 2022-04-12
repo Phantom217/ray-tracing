@@ -1,8 +1,8 @@
 mod camera;
 mod hittable;
 mod material;
-mod ray;
 mod object;
+mod ray;
 mod vec;
 
 use std::io::{stderr, Write};
@@ -13,8 +13,8 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use camera::Camera;
 use hittable::{Hittable, World};
 use material::{Dielectric, Lambertian, Metal};
-use ray::Ray;
 use object::{MovingSphere, Point4, Sphere};
+use ray::Ray;
 use vec::{Color, Point3, Vec3};
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
@@ -54,7 +54,7 @@ fn random_scene() -> World {
 
             if choose_mat < 0.8 {
                 // Diffuse
-                let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
+                let albedo = rng.gen::<Vec3>() * rng.gen::<Vec3>();
                 let sphere_mat = Lambertian::new(albedo);
                 let center0 = Point4::new(center, 0.0);
                 let center1 =

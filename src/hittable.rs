@@ -1,4 +1,4 @@
-use super::ray::Ray;
+use crate::ray::Ray;
 
 mod hitrecord;
 pub use hitrecord::HitRecord;

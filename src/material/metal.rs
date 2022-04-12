@@ -1,13 +1,17 @@
-use super::Material;
-use crate::{
-    hittable::HitRecord,
-    ray::Ray,
-    vec::{Color, Vec3},
-};
+use crate::hittable::HitRecord;
+use crate::material::Material;
+use crate::ray::Ray;
+use crate::vec::{Color, Vec3};
 
+/// A reflective material that looks like polished or frosted metal.
 #[derive(Debug, PartialEq)]
 pub struct Metal {
+    /// The amount of light energy reflected in each color component, so `Color(1., 1., 1.)` is a
+    /// white surface, and `Color(0., 0., 0.)` is totally black.
     albedo: Color,
+    /// The amount of randomness introduced into reflected rays. A `fuzz` of 0 makes the surface
+    /// look polished and mirror-smooth, while a `fuzz` of 1 produces a frosted, almost matte
+    /// surface.
     fuzz: f64,
 }
 

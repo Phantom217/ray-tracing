@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use super::{
+use crate::{
     ray::Ray,
     vec::{Point3, Vec3},
 };
@@ -39,8 +39,8 @@ impl Camera {
         let viewport_width = aspect_ratio * viewport_height;
 
         let cw = (lookfrom - lookat).normalized();
-        let cu = vup.cross(cw).normalized();
-        let cv = cw.cross(cu);
+        let cu = vup.cross(&cw).normalized();
+        let cv = cw.cross(&cu);
 
         let horizontal = focus_dist * viewport_width * cu;
         let vertical = focus_dist * viewport_height * cv;

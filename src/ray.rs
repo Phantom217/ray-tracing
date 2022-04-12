@@ -1,4 +1,4 @@
-use super::vec::{Point3, Vec3};
+use crate::vec::{Point3, Vec3};
 
 /// A ray, beginning at `origin` and extending along `direction`.
 #[derive(Debug)]

@@ -1,10 +1,12 @@
-use super::Material;
-use crate::{
-    hittable::HitRecord,
-    ray::Ray,
-    vec::{Color, Vec3},
-};
+use crate::hittable::HitRecord;
+use crate::material::Material;
+use crate::ray::Ray;
+use crate::vec::{Color, Vec3};
 
+/// An opaque material with a matte surface, where lighting is calculated
+/// using [Lambertian reflectance][lambert].
+///
+/// [lambert]: https://en.wikipedia.org/wiki/Lambertian_reflectance
 #[derive(Debug, PartialEq)]
 pub struct Lambertian {
     albedo: Color,
