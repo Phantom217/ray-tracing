@@ -1,6 +1,7 @@
 use super::vec::{Point3, Vec3};
 
-/// Type to represent a ray of light.
+/// A ray, beginning at `origin` and extending along `direction`.
+#[derive(Debug)]
 pub struct Ray {
     origin: Point3,
     direction: Vec3,
@@ -32,7 +33,9 @@ impl Ray {
         self.time
     }
 
-    /// Get position of the `Ray` at given time (`t`).
+    /// Finds the point along the ray at distance `t` from the origin. Positive
+    /// values of `t` represent positions forward from the origin, and negative
+    /// values, behind the origin.
     pub fn at(&self, t: f64) -> Point3 {
         self.origin + t * self.direction
     }

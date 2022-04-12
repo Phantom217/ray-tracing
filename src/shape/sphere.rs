@@ -6,6 +6,7 @@ use crate::{
     vec::Point3,
 };
 
+/// A sphere
 #[derive(Debug)]
 pub struct Sphere<M: Material> {
     center: Point3,
