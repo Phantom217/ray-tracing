@@ -2,7 +2,7 @@ use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
     ray::Ray,
-    shape::Point4,
+    object::Point4,
     vec::Point3,
 };
 

@@ -2,7 +2,7 @@ mod camera;
 mod hittable;
 mod material;
 mod ray;
-mod shape;
+mod object;
 mod vec;
 
 use std::io::{stderr, Write};
@@ -14,7 +14,7 @@ use camera::Camera;
 use hittable::{Hittable, World};
 use material::{Dielectric, Lambertian, Metal};
 use ray::Ray;
-use shape::{MovingSphere, Point4, Sphere};
+use object::{MovingSphere, Point4, Sphere};
 use vec::{Color, Point3, Vec3};
 
 /// Linearly blends white and blue depending on the height of the `y` coordinate _after_ scaling
