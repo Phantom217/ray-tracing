@@ -227,6 +227,16 @@ impl ::std::ops::Index<Channel> for Vec3 {
     }
 }
 
+impl ::std::ops::IndexMut<Channel> for Vec3 {
+    fn index_mut(&mut self, index: Channel) -> &mut Self::Output {
+        match index {
+            R => &mut self.0,
+            G => &mut self.1,
+            B => &mut self.2,
+        }
+    }
+}
+
 /// Names for vector lanes when used as a coordinate.
 ///
 /// `Vec3` has an `Index` impl for `Axis`, so you can use `Axis` values to select components from a
@@ -257,6 +267,16 @@ impl ::std::ops::Index<Axis> for Vec3 {
             X => &self.0,
             Y => &self.1,
             Z => &self.2,
+        }
+    }
+}
+
+impl ::std::ops::IndexMut<Axis> for Vec3 {
+    fn index_mut(&mut self, index: Axis) -> &mut Self::Output {
+        match index {
+            X => &mut self.0,
+            Y => &mut self.1,
+            Z => &mut self.2,
         }
     }
 }
