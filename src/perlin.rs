@@ -16,7 +16,7 @@ fn generate_perm(rng: &mut impl Rng) -> Vec<u8> {
 fn generate_vecs(rng: &mut impl Rng) -> Vec<Vec3> {
     let mut f = Vec::with_capacity(256);
     for _ in 0..256 {
-        f.push(Vec3::in_unit_sphere(rng))
+        f.push(Vec3::in_unit_sphere(rng));
     }
     f
 }
@@ -38,8 +38,7 @@ fn trilinear_interp(corners: &[[[Vec3; 2]; 2]; 2], uvw: Vec3) -> f64 {
                 let ijk = Vec3(i as f64, j as f64, k as f64);
                 let weight = corners[i][j][k].dot(uvw - ijk);
                 let ijk_inv = Vec3::from(1.) - ijk;
-                accum =
-                    accum + (ijk * uvw3 + ijk_inv * uvw3_inv).reduce(std::ops::Mul::mul) * weight;
+                accum += (ijk * uvw3 + ijk_inv * uvw3_inv).reduce(std::ops::Mul::mul) * weight;
             }
         }
     }
@@ -56,7 +55,7 @@ pub fn noise(p: Vec3) -> f64 {
                 let ix = PERM_X[((ijk.0 as i32 + di as i32) & 255) as usize];
                 let iy = PERM_Y[((ijk.1 as i32 + dj as i32) & 255) as usize];
                 let iz = PERM_Z[((ijk.2 as i32 + dk as i32) & 255) as usize];
-                corners[di][dj][dk] = VECS[(ix ^ iy ^ iz) as usize]
+                corners[di][dj][dk] = VECS[(ix ^ iy ^ iz) as usize];
             }
         }
     }
