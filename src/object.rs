@@ -104,7 +104,7 @@ impl<'o> HitRecord1<'o> {
 ///
 /// The `'m` lifetime refers to the `Material` of the `Object`, which we capture by reference.
 /// Thus, a `HitRecord` cannot outlive the `Object` to which it refers.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct HitRecord<'m> {
     /// Position along the ray, expressed in distance from the origin.
     pub t: f64,
