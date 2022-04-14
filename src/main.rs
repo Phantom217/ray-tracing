@@ -64,7 +64,6 @@ fn simple_light_scene(
                 material: Material::Lambertian {
                     albedo: ray_tracing::texture::constant(Vec3::from(0.3)),
                 },
-                motion: Vec3::default(),
             },
             offset: 277. + 257. * rng.gen::<Vec3>(),
         }));

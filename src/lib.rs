@@ -15,7 +15,7 @@ use crate::camera::Camera;
 use crate::material::Material;
 use crate::object::Object;
 use crate::ray::Ray;
-use crate::vec3::{Axis::*, Channel::*, *};
+use crate::vec3::{Channel::*, *};
 
 pub trait World: Send + Sync {
     fn hit_top<'a>(&'a self, ray: &Ray) -> Option<object::HitRecord<'a>>;

@@ -115,7 +115,7 @@ impl Object for Bvh {
         }
     }
 
-    fn bounding_box(&self, exposure: Range<f64>) -> Aabb {
+    fn bounding_box(&self, _exposure: Range<f64>) -> Aabb {
         self.bounding_box
     }
 }
