@@ -52,12 +52,8 @@ impl Object {
     /// an illusion. Second, while the upper end of `t_range` starts out as infinity, we adjust it
     /// down as we find objects along `ray`. Once we've found an object at position `t`, we can
     /// ignore any objects at positions greater than `t`.
-    ///
-    /// This function returns a `HitRecord1`, which can be turned into a full `HitRecord` by
-    /// calling its `finish` method. (We don't return a full `HitRecord` here because we may find
-    /// hits on multiple objects, but we only want to do all the work for the closest one.)
     #[inline]
-    pub fn hit<'o>(&'o self, ray: &Ray, t_range: Range<f64>) -> Option<HitRecord1<'o>> {
+    pub fn hit<'o>(&'o self, ray: &Ray, t_range: Range<f64>) -> Option<HitRecord<'o>> {
         match self {
             Object::Sphere {
                 center,
@@ -65,9 +61,9 @@ impl Object {
                 material,
                 motion,
             } => {
-                let center = ray.time * *motion + *center;
+                let t_center = ray.time * *motion + *center;
 
-                let oc = ray.origin - center;
+                let oc = ray.origin - t_center;
                 let a = ray.direction.dot(ray.direction);
                 let b = oc.dot(ray.direction);
                 let c = oc.dot(oc) - radius * radius;
@@ -78,9 +74,11 @@ impl Object {
                         (-b + discriminant.sqrt()) / a,
                     ] {
                         if t < t_range.end && t >= t_range.start {
-                            return Some(HitRecord1 {
+                            let p = ray.point_at_parameter(t);
+                            return Some(HitRecord {
                                 t,
-                                object: self,
+                                p,
+                                normal: (p - *center) / *radius,
                                 material,
                             });
                         }
@@ -110,31 +108,20 @@ impl Object {
                     return None;
                 }
 
-                Some(HitRecord1 {
-                    t,
-                    object: self,
-                    material,
-                })
-            }
-            Object::FlipNormals(o) => o
-                .hit(ray, t_range)
-                .map(|h| HitRecord1 { object: self, ..h }),
-        }
-    }
-
-    /// Computes the surface normal at a given point. If the point is not on the surface, the
-    /// result will be bogus. However, this is only available within this module, and we use it
-    /// carefully.
-    #[inline]
-    fn normal_at(&self, p: Vec3) -> Vec3 {
-        match self {
-            Object::Sphere { center, radius, .. } => (p - *center) / *radius,
-            Object::Rect { orthogonal_to, .. } => {
+                let p = ray.point_at_parameter(t);
                 let mut normal = Vec3::default();
                 normal[*orthogonal_to] = 1.;
-                normal
+                Some(HitRecord {
+                    t,
+                    p,
+                    material,
+                    normal,
+                })
             }
-            Object::FlipNormals(o) => -o.normal_at(p),
+            Object::FlipNormals(o) => o.hit(ray, t_range).map(|h| HitRecord {
+                normal: -h.normal,
+                ..h
+            }),
         }
     }
 
@@ -231,29 +218,6 @@ pub fn rect_prism(p0: Vec3, p1: Vec3, material: Material) -> Vec<Object> {
             material: material.clone(),
         })),
     ]
-}
-
-/// Initial cheap ray-object intersection record, used before we've decided which object was
-/// actually hit.
-pub struct HitRecord1<'a> {
-    /// Position along the ray, expressed in distance from the origin.
-    pub t: f64,
-    /// Object that was hit.
-    object: &'a Object,
-    /// Material that was hit.
-    material: &'a Material,
-}
-
-impl<'o> HitRecord1<'o> {
-    pub fn finish(self, ray: &Ray) -> HitRecord<'o> {
-        let p = ray.point_at_parameter(self.t);
-        HitRecord {
-            t: self.t,
-            p,
-            normal: self.object.normal_at(p),
-            material: self.material,
-        }
-    }
 }
 
 /// A description of a `Ray` hitting an `Object`. This stores information needed for rendering

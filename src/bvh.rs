@@ -3,7 +3,7 @@ use std::ops::Range;
 use rand::prelude::*;
 
 use crate::aabb::Aabb;
-use crate::object::{HitRecord1, Object};
+use crate::object::{HitRecord, Object};
 use crate::ray::Ray;
 use crate::vec3::Axis::{self, *};
 
@@ -21,7 +21,7 @@ pub enum BvhContents {
 }
 
 impl Bvh {
-    pub fn hit<'o>(&'o self, ray: &Ray, mut t_range: Range<f64>) -> Option<HitRecord1<'o>> {
+    pub fn hit<'o>(&'o self, ray: &Ray, mut t_range: Range<f64>) -> Option<HitRecord<'o>> {
         if self.bounding_box.hit(ray, t_range.clone()) {
             match &self.contents {
                 BvhContents::Node { left, right } => {
