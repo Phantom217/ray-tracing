@@ -27,9 +27,7 @@ fn cornell_box_scene(nx: usize, ny: usize) -> (Vec<Box<dyn Object>>, Camera, Ran
         exposure.clone(),
     );
 
-    let world = cornell_box();
-
-    (world, camera, exposure)
+    (cornell_box_with_boxes(), camera, exposure)
 }
 
 fn simple_light_scene(
@@ -69,7 +67,7 @@ fn simple_light_scene(
                 motion: Vec3::default(),
             },
             offset: 277. + 257. * rng.gen::<Vec3>(),
-        }))
+        }));
     }
 
     (world, camera, exposure)
