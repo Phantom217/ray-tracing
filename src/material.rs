@@ -123,6 +123,7 @@ impl std::fmt::Debug for Material {
 /// surface.
 ///
 /// [schlick]: https://en.wikipedia.org/wiki/Schlick%27s_approximation
+#[inline]
 fn schlick(cos: f64, ref_idx: f64) -> f64 {
     let r0 = (1. - ref_idx) / (1. + ref_idx);
     let r0 = r0 * r0;
