@@ -31,8 +31,10 @@ pub enum Material {
         /// [ref-idx]: https://en.wikipedia.org/wiki/Refractive_index
         ref_idx: f64,
     },
-    /// Diffuse Light.
+    /// Diffuse light.
     DiffuseLight { emission: Texture, brightness: f64 },
+    /// Isotropoc scattering.
+    Isotropic { albedo: Texture },
 }
 
 impl Material {
@@ -99,6 +101,14 @@ impl Material {
                 Some((ray, attenuation))
             }
             Material::DiffuseLight { .. } => None,
+            Material::Isotropic { albedo } => Some((
+                Ray {
+                    origin: hit.p,
+                    direction: Vec3::in_unit_sphere(rng),
+                    ..*ray
+                },
+                albedo(hit.p),
+            )),
         }
     }
 
