@@ -85,18 +85,23 @@ impl Bvh {
 }
 
 impl Object for Bvh {
-    fn hit<'o>(&'o self, ray: &Ray, mut t_range: Range<f64>) -> Option<HitRecord<'o>> {
+    fn hit<'o>(
+        &'o self,
+        ray: &Ray,
+        mut t_range: Range<f64>,
+        rng: &mut dyn FnMut() -> f64,
+    ) -> Option<HitRecord<'o>> {
         if self.bounding_box.hit(ray, t_range.clone()) {
             match &self.contents {
                 BvhContents::Node { left, right } => {
-                    let hit_left = left.hit(ray, t_range.clone());
+                    let hit_left = left.hit(ray, t_range.clone(), rng);
 
                     // Don't bother searching past the left hit in the right space.
                     if let Some(h) = &hit_left {
                         t_range.end = h.t;
                     }
 
-                    let hit_right = right.hit(ray, t_range);
+                    let hit_right = right.hit(ray, t_range, rng);
                     match (hit_left, hit_right) {
                         (h, None) | (None, h) => h,
                         (Some(hl), Some(hr)) => {
@@ -108,7 +113,7 @@ impl Object for Bvh {
                         }
                     }
                 }
-                BvhContents::Leaf(obj) => obj.hit(ray, t_range),
+                BvhContents::Leaf(obj) => obj.hit(ray, t_range, rng),
             }
         } else {
             None
