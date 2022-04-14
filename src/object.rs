@@ -87,7 +87,7 @@ pub struct HitRecord<'m> {
 }
 
 /// A sphere.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sphere {
     /// Radius of the sphere.
     pub radius: f64,
@@ -134,7 +134,7 @@ impl Object for Sphere {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Rect<A> {
     pub orthogonal_to: A,
     pub range0: Range<f64>,
@@ -196,7 +196,7 @@ impl<A: StaticAxis> Object for Rect<A> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FlipNormals<T>(pub T);
 
 impl<T: Object> Object for FlipNormals<T> {
@@ -218,7 +218,7 @@ impl<T: Object> Object for FlipNormals<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Translate<T> {
     pub offset: Vec3,
     pub object: T,
@@ -251,7 +251,7 @@ impl<T: Object> Object for Translate<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotateY<T> {
     pub object: T,
     pub sin_theta: f64,
@@ -309,7 +309,7 @@ impl<T: Object> Object for RotateY<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Composite<T>(pub T, pub Vec<T>);
 
 impl<T: Object> Object for Composite<T> {
@@ -338,7 +338,7 @@ impl<T: Object> Object for Composite<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct And<T, S>(pub T, pub S);
 
 impl<T: Object, S: Object> Object for And<T, S> {
@@ -428,7 +428,7 @@ pub fn rotate_y<O: Object>(degrees: f64, object: O) -> RotateY<O> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LinearMove<O> {
     pub object: O,
     pub motion: Vec3,
