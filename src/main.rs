@@ -4,12 +4,12 @@ use std::time::Instant;
 use rand::prelude::*;
 
 use ray_tracing::camera::Camera;
-use ray_tracing::object::Object;
+use ray_tracing::object::{self, Object};
 use ray_tracing::vec3::Vec3;
 use ray_tracing::*;
 
 #[allow(unused)]
-fn cornell_box_scene(nx: usize, ny: usize) -> (Vec<Object>, Camera, Range<f64>) {
+fn cornell_box_scene(nx: usize, ny: usize) -> (Vec<Box<dyn Object>>, Camera, Range<f64>) {
     let look_from = Vec3(278., 278., -800.);
     let look_at = Vec3(278., 278., 0.);
     let dist_to_focus = 10.;
@@ -36,7 +36,7 @@ fn simple_light_scene(
     nx: usize,
     ny: usize,
     rng: &mut impl Rng,
-) -> (Vec<Object>, Camera, Range<f64>) {
+) -> (Vec<Box<dyn Object>>, Camera, Range<f64>) {
     let look_from = Vec3(278., 278., -800.);
     let look_at = Vec3(278., 278., 0.);
     let dist_to_focus = 10.;
@@ -60,14 +60,16 @@ fn simple_light_scene(
 
     const SPHERES: usize = 1000;
     for _ in 0..SPHERES {
-        world.push(Object::Sphere {
-            center: 277. + 257. * rng.gen::<Vec3>(),
-            radius: 20.,
-            material: Material::Lambertian {
-                albedo: ray_tracing::texture::constant(Vec3::from(0.3)),
+        world.push(Box::new(object::Translate {
+            object: object::Sphere {
+                radius: 20.,
+                material: Material::Lambertian {
+                    albedo: ray_tracing::texture::constant(Vec3::from(0.3)),
+                },
+                motion: Vec3::default(),
             },
-            motion: Vec3::default(),
-        });
+            offset: 277. + 257. * rng.gen::<Vec3>(),
+        }))
     }
 
     (world, camera, exposure)
@@ -88,6 +90,7 @@ fn main() {
     let mut rng = rand::rngs::SmallRng::seed_from_u64(0xDEADBEEF);
 
     // World
+    //let (world, camera, exposure) = cornell_box_scene(NX, NY);
     let (world, camera, exposure) = simple_light_scene(NX, NY, &mut rng);
 
     let (image, time) = if USE_BVH {
@@ -98,7 +101,7 @@ fn main() {
         (par_cast(NX, NY, NS, &camera, world), start.elapsed())
     } else {
         eprintln!("Testing every ray against every object.");
-        let world: &[Object] = &world;
+        let world: &[Box<dyn Object>] = &world;
         let start = Instant::now();
         (par_cast(NX, NY, NS, &camera, world), start.elapsed())
     };

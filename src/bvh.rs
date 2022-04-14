@@ -17,46 +17,16 @@ pub struct Bvh {
 #[derive(Debug)]
 pub enum BvhContents {
     Node { left: Box<Bvh>, right: Box<Bvh> },
-    Leaf(Box<Object>),
+    Leaf(Box<dyn Object>),
 }
 
 impl Bvh {
-    pub fn hit<'o>(&'o self, ray: &Ray, mut t_range: Range<f64>) -> Option<HitRecord<'o>> {
-        if self.bounding_box.hit(ray, t_range.clone()) {
-            match &self.contents {
-                BvhContents::Node { left, right } => {
-                    let hit_left = left.hit(ray, t_range.clone());
-
-                    // Don't bother searching past the left hit in the right space.
-                    if let Some(h) = &hit_left {
-                        t_range.end = h.t;
-                    }
-
-                    let hit_right = right.hit(ray, t_range);
-                    match (hit_left, hit_right) {
-                        (h, None) | (None, h) => h,
-                        (Some(hl), Some(hr)) => {
-                            if hl.t < hr.t {
-                                Some(hl)
-                            } else {
-                                Some(hr)
-                            }
-                        }
-                    }
-                }
-                BvhContents::Leaf(obj) => obj.hit(ray, t_range),
-            }
-        } else {
-            None
-        }
-    }
-
-    pub fn new(mut objs: Vec<Box<Object>>, exposure: Range<f64>, rng: &mut impl Rng) -> Self {
+    pub fn new(mut objs: Vec<Box<dyn Object>>, exposure: Range<f64>, rng: &mut impl Rng) -> Self {
         // Note: though this BVH implementation is largely derived from Peter Shirley's, it does
         // *not* use the random axis selection and sort routine, because it tended to fall into
         // pathological cases.
 
-        fn axis_range(objs: &[Box<Object>], exposure: Range<f64>, axis: Axis) -> f64 {
+        fn axis_range(objs: &[Box<dyn Object>], exposure: Range<f64>, axis: Axis) -> f64 {
             let range = objs.iter().fold(f64::MAX..f64::MIN, |range, o| {
                 let bb = o.bounding_box(exposure.clone());
                 let min = bb.min[axis].min(bb.max[axis]);
@@ -114,7 +84,43 @@ impl Bvh {
     }
 }
 
-pub fn from_scene(scene: Vec<Object>, exposure: Range<f64>, rng: &mut impl Rng) -> Bvh {
-    let boxed = scene.into_iter().map(Box::new).collect();
-    Bvh::new(boxed, exposure, rng)
+impl Object for Bvh {
+    fn hit<'o>(&'o self, ray: &Ray, mut t_range: Range<f64>) -> Option<HitRecord<'o>> {
+        if self.bounding_box.hit(ray, t_range.clone()) {
+            match &self.contents {
+                BvhContents::Node { left, right } => {
+                    let hit_left = left.hit(ray, t_range.clone());
+
+                    // Don't bother searching past the left hit in the right space.
+                    if let Some(h) = &hit_left {
+                        t_range.end = h.t;
+                    }
+
+                    let hit_right = right.hit(ray, t_range);
+                    match (hit_left, hit_right) {
+                        (h, None) | (None, h) => h,
+                        (Some(hl), Some(hr)) => {
+                            if hl.t < hr.t {
+                                Some(hl)
+                            } else {
+                                Some(hr)
+                            }
+                        }
+                    }
+                }
+                BvhContents::Leaf(obj) => obj.hit(ray, t_range),
+            }
+        } else {
+            None
+        }
+    }
+
+    fn bounding_box(&self, exposure: Range<f64>) -> Aabb {
+        self.bounding_box
+    }
+}
+
+// TODO: this no longer has much value
+pub fn from_scene(scene: Vec<Box<dyn Object>>, exposure: Range<f64>, rng: &mut impl Rng) -> Bvh {
+    Bvh::new(scene, exposure, rng)
 }
