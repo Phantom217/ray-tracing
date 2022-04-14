@@ -78,6 +78,20 @@ impl Vec3 {
         Self(f(self.0, rhs.0), f(self.1, rhs.1), f(self.2, rhs.2))
     }
 
+    #[inline]
+    pub fn zip_with3(
+        self,
+        other1: Vec3,
+        other2: Vec3,
+        mut f: impl FnMut(f64, f64, f64) -> f64,
+    ) -> Self {
+        Self(
+            f(self.0, other1.0, other2.0),
+            f(self.1, other1.1, other2.1),
+            f(self.2, other1.2, other2.2),
+        )
+    }
+
     /// Combines the elements of `self` using `f` until only one result remains.
     #[inline]
     pub fn reduce(self, f: impl Fn(f64, f64) -> f64) -> f64 {

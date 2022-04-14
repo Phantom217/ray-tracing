@@ -1,5 +1,6 @@
 use std::ops::Range;
 
+use crate::aabb::Aabb;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{
@@ -18,6 +19,7 @@ fn other_axes(axis: Axis) -> (Axis, Axis) {
 /// An object in a scene.
 ///
 /// The primary purpose of an `Object` is to interact with rays of light using the `hit` method.
+#[derive(Debug)]
 pub enum Object {
     /// A sphere.
     Sphere {
@@ -38,7 +40,6 @@ pub enum Object {
         material: Material,
     },
     FlipNormals(Box<Object>),
-    List(Vec<Object>),
 }
 
 impl Object {
@@ -118,19 +119,6 @@ impl Object {
             Object::FlipNormals(o) => o
                 .hit(ray, t_range)
                 .map(|h| HitRecord1 { object: self, ..h }),
-            Object::List(objs) => {
-                let mut t_range = t_range;
-                let mut hit = None;
-
-                for obj in objs {
-                    if let Some(rec) = obj.hit(ray, t_range.clone()) {
-                        t_range.end = rec.t;
-                        hit = Some(rec);
-                    }
-                }
-
-                hit
-            }
         }
     }
 
@@ -147,13 +135,59 @@ impl Object {
                 normal
             }
             Object::FlipNormals(o) => -o.normal_at(p),
-            Object::List(_) => unreachable!("uhhhhh"),
+        }
+    }
+
+    pub fn bounding_box(&self, exposure: std::ops::Range<f64>) -> Aabb {
+        match self {
+            Object::Sphere {
+                center,
+                radius,
+                motion,
+                ..
+            } => {
+                let p1 = *center + exposure.start * *motion;
+                let bb1 = Aabb {
+                    min: p1 - Vec3::from(*radius),
+                    max: p1 + Vec3::from(*radius),
+                };
+                let p2 = *center + exposure.end * *motion;
+                let bb2 = Aabb {
+                    min: p2 - Vec3::from(*radius),
+                    max: p2 + Vec3::from(*radius),
+                };
+
+                bb1.merge(bb2)
+            }
+            Object::Rect {
+                orthogonal_to,
+                range0,
+                range1,
+                k,
+                ..
+            } => {
+                let mut min = Vec3::default();
+                let mut max = Vec3::default();
+                let z_axis = *orthogonal_to;
+                let (x_axis, y_axis) = other_axes(z_axis);
+
+                // TODO: this uses epsilon fudge factors and I hate it
+                min[z_axis] = *k - 0.0001;
+                max[z_axis] = *k + 0.0001;
+                min[x_axis] = range0.start;
+                max[x_axis] = range0.end;
+                min[y_axis] = range1.start;
+                max[y_axis] = range1.end;
+
+                Aabb { min, max }
+            }
+            Object::FlipNormals(o) => o.bounding_box(exposure),
         }
     }
 }
 
-pub fn rect_prism(p0: Vec3, p1: Vec3, material: Material) -> Object {
-    Object::List(vec![
+pub fn rect_prism(p0: Vec3, p1: Vec3, material: Material) -> Vec<Object> {
+    vec![
         Object::Rect {
             orthogonal_to: Z,
             range0: p0[X]..p1[X],
@@ -196,14 +230,14 @@ pub fn rect_prism(p0: Vec3, p1: Vec3, material: Material) -> Object {
             k: p0[X],
             material: material.clone(),
         })),
-    ])
+    ]
 }
 
 /// Initial cheap ray-object intersection record, used before we've decided which object was
 /// actually hit.
 pub struct HitRecord1<'a> {
     /// Position along the ray, expressed in distance from the origin.
-    t: f64,
+    pub t: f64,
     /// Object that was hit.
     object: &'a Object,
     /// Material that was hit.
@@ -237,21 +271,4 @@ pub struct HitRecord<'m> {
     pub normal: Vec3,
     /// Material of the object at the hit position.
     pub material: &'m Material,
-}
-
-/// Runs through the `slice` of `Object`s looking for the closest hit for `ray`.
-pub fn hit_slice<'m>(slice: &'m [Object], ray: &Ray) -> Option<HitRecord<'m>> {
-    const NEAR: f64 = 0.001;
-
-    let mut nearest = std::f64::MAX;
-    let mut hit = None;
-
-    for obj in slice {
-        if let Some(rec) = obj.hit(ray, NEAR..nearest) {
-            nearest = rec.t;
-            hit = Some(rec);
-        }
-    }
-
-    hit.map(|h| h.finish(ray))
 }

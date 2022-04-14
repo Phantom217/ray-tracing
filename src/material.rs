@@ -113,6 +113,12 @@ impl Material {
     }
 }
 
+impl std::fmt::Debug for Material {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("...")
+    }
+}
+
 /// [Schlick's approximation][schlick] for computing reflection vs. refraction at a material
 /// surface.
 ///
