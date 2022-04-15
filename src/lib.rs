@@ -55,23 +55,39 @@ impl World for bvh::Bvh {
 ///
 /// This is the actual ray-tracing routine.
 pub fn color(world: &impl World, mut ray: Ray, rng: &mut impl Rng) -> Vec3 {
+    // Accumulates contribution of each surface we reach
+    let mut accum = Vec3::default();
+    // Records the cumulative (product) attenuation fo each surface we've visited so far
     let mut strength = Vec3::from(1.);
-    let mut emitted = Vec3::default();
+
     let mut bounces = 0;
 
+    // Iterate until one of the following conditions is reached:
+    // 1. The ray escapes into space (i.e. no objects are hit).
+    // 2. The ray reaches a surface that does not scatter.
+    // 3. The ray bounces more than 50 times.
     while let Some(hit) = world.hit_top(&ray, rng) {
-        if bounces < 50 {
-            if let Some((new_ray, attenuation)) = hit.material.scatter(&ray, &hit, rng) {
-                ray = new_ray;
-                emitted = emitted + strength * hit.material.emitted(hit.p);
-                strength *= attenuation;
-                bounces += 1;
-                continue;
-            } else {
-                return emitted + strength * hit.material.emitted(hit.p);
-            }
+        if bounces == 50 {
+            break;
         }
-        return Vec3::default();
+        bounces += 1;
+
+        // Record this hit's contribution, attenuated by the total attenuation so far.
+        accum += strength * hit.material.emitted(hit.p);
+
+        // Check whether the material scatters light, generating a new ray. In practive this is
+        // true for everything but the emission-only `DiffuseLight` type.
+        //
+        // TODO: and also for frosted metal, which effectively makes frosted metal an emitter. That
+        // can't be right.
+        if let Some((new_ray, attenuation)) = hit.material.scatter(&ray, &hit, rng) {
+            // Redirect flight, accumulate the new attenuation value
+            ray = new_ray;
+            strength *= attenuation;
+        } else {
+            // Locally absorbed; we're done
+            return accum;
+        }
     }
 
     Vec3::default()

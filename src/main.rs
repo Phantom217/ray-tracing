@@ -67,6 +67,7 @@ fn motion_test(nx: usize, ny: usize) -> (Vec<Box<dyn Object>>, Camera, Range<f64
     (scene, camera, exposure)
 }
 
+#[allow(unused)]
 fn volume_test(nx: usize, ny: usize) -> (Vec<Box<dyn Object>>, Camera, Range<f64>) {
     let look_from = Vec3(278., 278., -800.);
     let look_at = Vec3(278., 278., 0.);
@@ -158,6 +159,7 @@ fn simple_light_scene(
     (world, camera, exposure)
 }
 
+#[allow(unused)]
 fn book_final_scene(
     nx: usize,
     ny: usize,

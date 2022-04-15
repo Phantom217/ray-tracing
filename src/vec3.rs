@@ -178,6 +178,13 @@ impl std::ops::MulAssign<Vec3> for Vec3 {
     }
 }
 
+impl std::ops::AddAssign<Vec3> for Vec3 {
+    #[inline]
+    fn add_assign(&mut self, rhs: Vec3) {
+        *self = self.zip_with(rhs, std::ops::Add::add);
+    }
+}
+
 /// `-vector`
 impl std::ops::Neg for Vec3 {
     type Output = Vec3;
