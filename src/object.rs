@@ -152,9 +152,9 @@ pub trait StaticAxis: std::fmt::Debug + Send + Sync {
 pub struct StaticX;
 
 impl StaticAxis for StaticX {
-    const AXIS: Axis = Axis::X;
-    const OTHER1: Axis = Axis::Y;
-    const OTHER2: Axis = Axis::Z;
+    const AXIS: Axis = X;
+    const OTHER1: Axis = Y;
+    const OTHER2: Axis = Z;
 }
 
 /// Compile-time (static) name for the Y axis.
@@ -162,9 +162,9 @@ impl StaticAxis for StaticX {
 pub struct StaticY;
 
 impl StaticAxis for StaticY {
-    const AXIS: Axis = Axis::Y;
-    const OTHER1: Axis = Axis::X;
-    const OTHER2: Axis = Axis::Z;
+    const AXIS: Axis = Y;
+    const OTHER1: Axis = X;
+    const OTHER2: Axis = Z;
 }
 
 /// Compile-time (static) name for the Z axis.
@@ -172,9 +172,9 @@ impl StaticAxis for StaticY {
 pub struct StaticZ;
 
 impl StaticAxis for StaticZ {
-    const AXIS: Axis = Axis::Z;
-    const OTHER1: Axis = Axis::X;
-    const OTHER2: Axis = Axis::Y;
+    const AXIS: Axis = Z;
+    const OTHER1: Axis = X;
+    const OTHER2: Axis = Y;
 }
 
 impl<A: StaticAxis> Object for Rect<A> {
@@ -344,35 +344,6 @@ impl<T: Object> Object for RotateY<T> {
             },
         );
         Aabb { min, max }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Composite<T>(pub T, pub Vec<T>);
-
-impl<T: Object> Object for Composite<T> {
-    fn hit<'o>(
-        &'o self,
-        ray: &Ray,
-        mut t_range: Range<f64>,
-        rng: &mut dyn FnMut() -> f64,
-    ) -> Option<HitRecord<'o>> {
-        let mut hit = None;
-        for object in self.1.iter().chain(std::iter::once(&self.0)) {
-            if let Some(rec) = object.hit(ray, t_range.clone(), rng) {
-                t_range.end = rec.t;
-                hit = Some(rec);
-            }
-        }
-        hit
-    }
-
-    fn bounding_box(&self, exposure: Range<f64>) -> Aabb {
-        self.1
-            .iter()
-            .fold(self.0.bounding_box(exposure.clone()), |a, b| {
-                a.merge(b.bounding_box(exposure.clone()))
-            })
     }
 }
 

@@ -1,3 +1,6 @@
+#![forbid(unsafe_code)]
+#![deny(bare_trait_objects, unused_qualifications)]
+
 mod aabb;
 pub mod bvh;
 pub mod camera;
@@ -363,7 +366,7 @@ pub fn par_cast(nx: usize, ny: usize, ns: usize, camera: &Camera, world: impl Wo
     Image::par_compute(nx, ny, |x, y| {
         let col: Vec3 = (0..ns)
             .map(|_| {
-                let mut rng = rand::thread_rng();
+                let mut rng = thread_rng();
                 let u = (x as f64 + rng.gen::<f64>()) / nx as f64;
                 let v = (y as f64 + rng.gen::<f64>()) / ny as f64;
                 let r = camera.get_ray(u, v, &mut rng);

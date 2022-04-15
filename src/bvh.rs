@@ -1,7 +1,5 @@
 use std::ops::Range;
 
-use rand::prelude::*;
-
 use crate::aabb::Aabb;
 use crate::object::{HitRecord, Object};
 use crate::ray::Ray;
