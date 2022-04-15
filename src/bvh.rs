@@ -21,7 +21,7 @@ pub enum BvhContents {
 }
 
 impl Bvh {
-    pub fn new(mut objs: Vec<Box<dyn Object>>, exposure: Range<f64>, rng: &mut impl Rng) -> Self {
+    pub fn new(mut objs: Vec<Box<dyn Object>>, exposure: Range<f64>) -> Self {
         // Note: though this BVH implementation is largely derived from Peter Shirley's, it does
         // *not* use the random axis selection and sort routine, because it tended to fall into
         // pathological cases.
@@ -70,9 +70,8 @@ impl Bvh {
                 let right = Box::new(Bvh::new(
                     objs.drain(objs.len() / 2..).collect(),
                     exposure.clone(),
-                    rng,
                 ));
-                let left = Box::new(Bvh::new(objs, exposure.clone(), rng));
+                let left = Box::new(Bvh::new(objs, exposure.clone()));
 
                 Bvh {
                     bounding_box: left.bounding_box.merge(right.bounding_box),
@@ -126,6 +125,6 @@ impl Object for Bvh {
 }
 
 // TODO: this no longer has much value
-pub fn from_scene(scene: Vec<Box<dyn Object>>, exposure: Range<f64>, rng: &mut impl Rng) -> Bvh {
-    Bvh::new(scene, exposure, rng)
+pub fn from_scene(scene: Vec<Box<dyn Object>>, exposure: Range<f64>) -> Bvh {
+    Bvh::new(scene, exposure)
 }
