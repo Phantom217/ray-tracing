@@ -36,6 +36,21 @@ pub trait Object: std::fmt::Debug + Send + Sync {
     fn bounding_box(&self, exposure: Range<f64>) -> Aabb;
 }
 
+impl Object for Box<dyn Object> {
+    fn hit<'o>(
+        &'o self,
+        ray: &Ray,
+        t_range: Range<f64>,
+        rng: &mut dyn FnMut() -> f64,
+    ) -> Option<HitRecord<'o>> {
+        (**self).hit(ray, t_range, rng)
+    }
+
+    fn bounding_box(&self, exposure: Range<f64>) -> Aabb {
+        (**self).bounding_box(exposure)
+    }
+}
+
 /// A description of a `Ray` hitting an `Object`. This stores information needed for rendering
 /// later.
 ///
