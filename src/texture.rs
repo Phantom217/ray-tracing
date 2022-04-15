@@ -21,6 +21,6 @@ pub fn checker(t0: Texture, t1: Texture) -> Texture {
 }
 
 pub fn perlin(scale: f64) -> Texture {
-    //Arc::new(move |p| Vec3::from(perlin::turb(scale * p, 7)))
-    Arc::new(move |p| Vec3::from(0.5 * (1. + f64::sin(scale * p.2 + 10. * perlin::turb(p, 7)))))
+    Arc::new(move |p| Vec3::from(perlin::turb(scale * p, 7)))
+    //Arc::new(move |p| Vec3::from(0.5 * (1. + f64::sin(scale * p.2 + 10. * perlin::turb(p, 7)))))
 }

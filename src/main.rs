@@ -147,15 +147,180 @@ fn simple_light_scene(
         }));
     }
 
+    world.push(Box::new(object::FlipNormals(object::Sphere {
+        radius: 1000.,
+        material: Material::DiffuseLight {
+            emission: ray_tracing::texture::constant(Vec3::from(0.1)),
+            brightness: 1.,
+        },
+    })));
+
+    (world, camera, exposure)
+}
+
+fn book_final_scene(
+    nx: usize,
+    ny: usize,
+    rng: &mut impl Rng,
+) -> (Vec<Box<dyn Object>>, Camera, Range<f64>) {
+    let look_from = Vec3(478., 278., -600.);
+    let look_at = Vec3(278., 278., 0.);
+    let dist_to_focus = 10.;
+    let aperture = 0.0;
+    let exposure = 0. ..1.;
+
+    let camera = Camera::look(
+        look_from,
+        look_at,
+        Vec3(0., 1., 0.),
+        40.,
+        nx as f64 / ny as f64,
+        aperture,
+        dist_to_focus,
+        exposure.clone(),
+    );
+
+    use ray_tracing::material::Material;
+    use ray_tracing::texture;
+
+    let ground = Material::Lambertian {
+        albedo: texture::constant(Vec3(0.48, 0.83, 0.53)),
+    };
+
+    let mut world: Vec<Box<dyn Object>> = vec![];
+
+    // make random floor
+    for i in 0..20 {
+        for j in 0..20 {
+            const W: f64 = 100.;
+            let c0 = Vec3(-1000. + i as f64 * W, 0., -1000. + j as f64 * W);
+            let c1 = c0 + Vec3(W, 100. * (rng.gen::<f64>() + 0.01), W);
+            world.push(Box::new(object::rect_prism(c0, c1, ground.clone())));
+        }
+    }
+
+    // make light
+    world.push(Box::new(object::Rect {
+        orthogonal_to: object::StaticY,
+        range0: 123. ..423.,
+        range1: 147. ..412.,
+        k: 554.,
+        material: Material::DiffuseLight {
+            emission: texture::constant(Vec3::from(1.)),
+            brightness: 7.,
+        },
+    }));
+
+    // brown blurry sphere
+    world.push(Box::new(object::Translate {
+        offset: Vec3(400., 400., 200.),
+        object: object::LinearMove {
+            motion: Vec3(30., 0., 0.),
+            object: object::Sphere {
+                radius: 50.,
+                material: Material::Lambertian {
+                    albedo: texture::constant(Vec3(0.7, 0.3, 0.1)),
+                },
+            },
+        },
+    }));
+
+    let glass = Material::Dielectric { ref_idx: 1.5 };
+
+    // glass sphere
+    world.push(Box::new(object::Translate {
+        offset: Vec3(260., 150., 45.),
+        object: object::Sphere {
+            radius: 50.,
+            material: glass.clone(),
+        },
+    }));
+
+    // silvery sphere
+    world.push(Box::new(object::Translate {
+        offset: Vec3(0., 150., 145.),
+        object: object::Sphere {
+            radius: 50.,
+            material: Material::Metal {
+                albedo: Vec3(0.8, 0.8, 0.9),
+                fuzz: 10.,
+            },
+        },
+    }));
+
+    // blue glass sphere
+    let boundary = object::Translate {
+        offset: Vec3(360., 150., 145.),
+        object: object::Sphere {
+            radius: 70.,
+            material: glass.clone(),
+        },
+    };
+    world.push(Box::new(boundary.clone()));
+    world.push(Box::new(object::ConstantMedium {
+        boundary,
+        density: 0.2,
+        material: Material::Isotropic {
+            albedo: texture::constant(Vec3(0.2, 0.4, 0.9)),
+        },
+    }));
+
+    // fog
+    world.push(Box::new(object::ConstantMedium {
+        boundary: object::Sphere {
+            radius: 5000.,
+            material: glass.clone(), // doesn't matter
+        },
+        density: 0.0001,
+        material: Material::Isotropic {
+            albedo: texture::constant(Vec3::from(1.)),
+        },
+    }));
+
+    // perlin marbled sphere
+    world.push(Box::new(object::Translate {
+        offset: Vec3(220., 280., 300.),
+        object: object::Sphere {
+            radius: 80.,
+            material: Material::Lambertian {
+                albedo: texture::perlin(0.05),
+            },
+        },
+    }));
+
+    // cube made of random spheres
+    world.push(Box::new({
+        const SPHERES: usize = 1000;
+        let white = Material::Lambertian {
+            albedo: texture::constant(Vec3::from(0.73)),
+        };
+        let spheres = (0..SPHERES)
+            .map(|_| {
+                Box::new(object::Translate {
+                    offset: 165. * rng.gen::<Vec3>(),
+                    object: object::Sphere {
+                        radius: 10.,
+                        material: white.clone(),
+                    },
+                }) as Box<dyn Object>
+            })
+            .collect();
+        let bvh = ray_tracing::bvh::from_scene(spheres, exposure.clone(), rng);
+        object::Translate {
+            offset: Vec3(-100., 270., 395.),
+            object: object::rotate_y(15., bvh),
+        }
+    }));
+
     (world, camera, exposure)
 }
 
 const USE_BVH: bool = true;
 
 fn main() {
-    const NX: usize = 300;
-    const NY: usize = 300;
-    const NS: usize = 100;
+    const NX: usize = 800;
+    const NY: usize = 800;
+    const NS: usize = 10_000;
 
     eprintln!(
         "Parallel casting {} x {} image using {}x oversampling.",
@@ -167,7 +332,8 @@ fn main() {
     // World
     //let (world, camera, exposure) = cornell_box_scene(NX, NY);
     //let (world, camera, exposure) = simple_light_scene(NX, NY, &mut rng);
-    let (world, camera, exposure) = volume_test(NX, NY);
+    //let (world, camera, exposure) = volume_test(NX, NY);
+    let (world, camera, exposure) = book_final_scene(NX, NY, &mut rng);
 
     let (image, time) = if USE_BVH {
         eprintln!("Generating bounding volume hierarchy.");
