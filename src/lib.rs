@@ -68,7 +68,7 @@ pub fn color(world: &impl World, mut ray: Ray, rng: &mut impl Rng) -> Vec3 {
     // 3. The ray bounces more than 50 times.
     while let Some(hit) = world.hit_top(&ray, rng) {
         if bounces == 50 {
-            break;
+            return accum;
         }
         bounces += 1;
 
