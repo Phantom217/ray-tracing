@@ -130,6 +130,14 @@ impl std::ops::Mul<Vec3> for f64 {
     }
 }
 
+impl std::ops::Div for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        self.zip_with(rhs, std::ops::Div::div)
+    }
+}
+
 /// `vector / scalar`
 impl std::ops::Div<f64> for Vec3 {
     type Output = Vec3;
